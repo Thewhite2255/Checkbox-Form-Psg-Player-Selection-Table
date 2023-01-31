@@ -116,7 +116,7 @@ li {
     align-items: center;
     gap: 5px;
     grid-template-columns: max-content max-content;
-    max-height: 125px;
+    max-height: 135px;
     overflow-y: auto;
 }
 
