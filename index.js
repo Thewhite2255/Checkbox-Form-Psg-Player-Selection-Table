@@ -18,7 +18,7 @@ form.addEventListener("submit", (e) => {
 });
 
 
-let playerList = [
+const playerList = [
     {"Country": "Portugal", "Player": ["Vitinha", "Mendes", "Danilo",]},
     {"Country": "Spain", "Player": ["Sarabia", "Soler"]},
     {"Country": "Brazil", "Player": ["Marquinhos", "Neymar"]},
@@ -27,7 +27,6 @@ let playerList = [
     {"Country": "Morocco", "Player": ["Hakimi"]},
     {"Country": "Argentina", "Player": ["Messi"]},
 ];
-
 
 const tablePlayers = $(".table-players");
 
@@ -48,106 +47,73 @@ function team(players) {
             <label for="${element}">${element}</label>
         </div>`;
     }
-    
     return output;
 }
 
 const display = $(".display"),
-checkboxes = $$('input[type="checkbox"]'),
-SelectBtn = $("#select-btn");
+checkboxes = $$('.selector .field:not(.select-all) input'),
+selectAllBtn = $("#select-all");
+let tableSelection = [];
+console.log(checkboxes);
 
 checkboxes.forEach(checkbox => {
-    if (checkbox.id == "select-all") {
-        checkbox.addEventListener("change", selectAll);
-    } else {
-        checkbox.addEventListener("change", updateDisplay);
-    }
+    checkbox.addEventListener('change', function () {
+        checkboxes.forEach(i => {
+            tableSelection.push(i.checked);
+        });
+        if(tableSelection.includes(false)) {
+            selectAllBtn.checked = false;
+        } else {
+            selectAllBtn.checked = true;
+        }
+        tableSelection = [];
+        updateDisplay(this);
+    })
 });
 
-function selectAll(e) {
-    playerSeleted = [];
-    let target = e.target;
-    if (target.checked) {
-        display.innerHTML = "";
-        let table = target.closest(".table-players");
-        let allPlayer = table.querySelectorAll('input[name="player"]');
-        allPlayer.forEach((player) => {
-            player.checked = true;
-            addAllPlayer(player);
-        });
+selectAllBtn.addEventListener('change', function () {
+    display.innerHTML = '';
+    if (this.checked) {
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = true;
+            updateDisplay(checkbox);
+        })
     } else {
-        let table = target.closest(".table-players");
-        let allPlayer = table.querySelectorAll('input[name="player"]');
-        allPlayer.forEach((player) => {
-            if (player.checked == true) {
-                player.checked = false;
-                removeAllPlayer(player);
-            }
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = false;
+            display.innerHTML = '';
         })
     }
-}
-
-function addAllPlayer(player) {
-    let box = Object.assign(document.createElement("div"), {
-        className: `selected ${player.value}`
-    })
-    box.innerHTML = `
-        <span class="title">${player.value}</span>
-        <button onclick=removePlayerByBtn("${player.value}")><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg></button>`;
-    display.appendChild(box);
-    setTimeout(() => {
-        box.style.transform = "scale(1)";
-    }, 200);
-}
+})
 
 function addPlayer(e) {
     let box = Object.assign(document.createElement("div"), {
-        className: `selected ${e.target.value}`
+        className: `selected`
     })
+    box.setAttribute('data-value', e.value);
     box.innerHTML = `
-        <span class="title">${e.target.value}</span>
-        <button onclick=removePlayerByBtn("${e.target.value}")><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg></button>`;
+        <span class="title">${e.value}</span>
+        <button onclick=removePlayerByBtn("${e.value}")><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg></button>`;
     display.appendChild(box);
     setTimeout(() => {
         box.style.transform = "scale(1)";
-    }, 200);
-}
-
-function removeAllPlayer(player) {
-    let box = $(`.display .${player.value}`);
-    box.style.transform = "scale(0)";
-    setTimeout(() => {
-        box.remove();
     }, 200);
 }
 
 function removePlayer(e) {
-    playerSeleted.pop(e.target.value);
-    let box = $(`.display .${e.target.value}`);
-    box.style.transform = "scale(0)";
+    let target = $(`.selected[data-value="${e.value}"]`);
+    target.style.transform = "scale(0)";
     setTimeout(() => {
-        box.remove();
+        display.removeChild(target);
     }, 200);
 }
 
 function removePlayerByBtn(id) {
-    playerSeleted.pop(id);
-    let input = $(`.selector #${id}`);
-    if (input.checked) {
-        input.checked = false;
-        let box = $(`.display .${id}`);
-        box.style.transform = "scale(0)";
-        setTimeout(() => {
-            box.remove();
-        }, 200);
-    }
+    let input = $(`input#${id}`);
+    input.click();
 }
 
 function updateDisplay(e) {
-    if (e.target.checked) return addPlayer(e);
-    let selectAll = $("#select-all");
-    if (selectAll.checked) {
-        selectAll.checked = false;
-    }
+    if (e.checked) return addPlayer(e);
     removePlayer(e);
 }
