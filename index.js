@@ -111,6 +111,7 @@ function removePlayer(e) {
 function removePlayerByBtn(id) {
     let input = $(`input#${id}`);
     input.click();
+    tableSelection = [];
 }
 
 function updateDisplay(e) {
