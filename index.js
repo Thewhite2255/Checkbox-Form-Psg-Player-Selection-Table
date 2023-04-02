@@ -66,6 +66,11 @@ checkboxes.forEach(checkbox => {
         } else {
             selectAllBtn.checked = true;
         }
+        if (tableSelection.indexOf(true) > -1) {
+            display.classList.add('active')
+        } else {
+            display.classList.remove('active')
+        }
         tableSelection = [];
         updateDisplay(this);
     })
@@ -74,11 +79,13 @@ checkboxes.forEach(checkbox => {
 selectAllBtn.addEventListener('change', function () {
     display.innerHTML = '';
     if (this.checked) {
+        display.classList.add('active');
         checkboxes.forEach(checkbox => {
             checkbox.checked = true;
             updateDisplay(checkbox);
         })
     } else {
+        display.classList.remove('active');
         checkboxes.forEach(checkbox => {
             checkbox.checked = false;
             display.innerHTML = '';
